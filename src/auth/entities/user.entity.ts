@@ -1,4 +1,5 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { Tournament } from 'src/tournaments/entities/tournament.entity';
+import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 
 export enum UserRole {
   ORGANIZER = 'organizer',
@@ -40,4 +41,7 @@ export class User {
 
   @Column({ type: 'boolean', default: true })
   isActive: boolean;
+
+  @OneToMany(() => Tournament, (tournament) => tournament.organizer)
+organizedTournaments: Tournament[];
 }
