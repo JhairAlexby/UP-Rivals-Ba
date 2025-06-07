@@ -1,4 +1,5 @@
-import { IsString, IsNotEmpty, IsNumber, IsDateString, IsOptional } from 'class-validator';
+import { IsString, IsNotEmpty, IsNumber, IsDate, IsOptional } from 'class-validator';
+import { Type } from 'class-transformer'; 
 
 export class CreateTournamentDto {
   @IsString()
@@ -17,11 +18,13 @@ export class CreateTournamentDto {
   @IsNotEmpty()
   maxTeams: number;
 
-  @IsDateString()
+  @Type(() => Date) 
+  @IsDate() 
   @IsNotEmpty()
   startDate: Date;
 
-  @IsDateString()
+  @Type(() => Date) 
+  @IsDate() 
   @IsNotEmpty()
   endDate: Date;
 
