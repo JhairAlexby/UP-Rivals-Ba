@@ -25,12 +25,10 @@ npm run start:dev
 **RAW:**
 ```
 {
-  "firstName": "name",
-  "lastName": "lastName",
-  "paternalLastName": "paternalLastName",
-  "maternalLastName": "maternalLastName",
-  "email": "email@example.com",
-  "password": ""
+  "name": "Jhair Alejandro Cruz",
+  "email": "jhair.cruz@upchiapas.edu.mx",
+  "password": "Password123!",
+  "phone": "9611234567"
 }
 ```
 
@@ -44,11 +42,10 @@ npm run start:dev
 **PATCH:** `http://localhost:3000/auth/id`
 ```
 {
-    "firstName": "",
-    "lastName": "",
-    "email": "",
-    "paternalLastName": "",
-    "maternalLastName": ""
+  "name": "Jhair Alejandro Cruz",
+  "email": "jhair.cruz@upchiapas.edu.mx",
+  "password": "Password123!",
+  "phone": "9611234567"
 }
 ```
 
