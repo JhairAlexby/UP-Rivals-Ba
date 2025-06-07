@@ -1,4 +1,4 @@
-import { Controller, Post, Body, UseGuards } from '@nestjs/common';
+import { Controller, Post, Body, UseGuards, Get, Param } from '@nestjs/common';
 import { TournamentsService } from './tournaments.service';
 import { CreateTournamentDto } from './dto/create-tournament.dto';
 import { AuthGuard } from '@nestjs/passport';
@@ -9,17 +9,27 @@ import { GetUser } from 'src/auth/decorators/get-user.decorator';
 import { User } from 'src/auth/entities/user.entity';
 
 @Controller('tournaments')
-@UseGuards(AuthGuard('jwt')) // Protege todos los endpoints de este controlador
 export class TournamentsController {
   constructor(private readonly tournamentsService: TournamentsService) {}
 
   @Post()
-  @UseGuards(RolesGuard) // Aplica el guardia de roles
-  @Roles(UserRole.ORGANIZER) // Solo los organizadores pueden acceder
+  @UseGuards(AuthGuard('jwt'), RolesGuard) 
+  @Roles(UserRole.ORGANIZER)
   create(
     @Body() createTournamentDto: CreateTournamentDto,
     @GetUser() organizer: User,
   ) {
     return this.tournamentsService.create(createTournamentDto, organizer);
+  }
+
+
+  @Get()
+  findAll() {
+    return this.tournamentsService.findAll();
+  }
+
+  @Get(':id')
+  findOne(@Param('id') id: string) {
+    return this.tournamentsService.findOne(id);
   }
 }

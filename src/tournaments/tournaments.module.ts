@@ -3,14 +3,14 @@ import { TournamentsService } from './tournaments.service';
 import { TournamentsController } from './tournaments.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Tournament } from './entities/tournament.entity';
-import { AuthModule } from 'src/auth/auth.module'; // <-- Importa AuthModule
+import { AuthModule } from 'src/auth/auth.module'; 
 
 @Module({
   controllers: [TournamentsController],
   providers: [TournamentsService],
   imports: [
     TypeOrmModule.forFeature([Tournament]),
-    AuthModule, // <-- Añádelo aquí para usar los guards y estrategias
+    AuthModule,
   ],
 })
 export class TournamentsModule {}
