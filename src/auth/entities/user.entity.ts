@@ -1,6 +1,5 @@
 import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 
-// Definición del Enum con los roles permitidos
 export enum UserRole {
   ORGANIZER = 'organizer',
   PLAYER = 'player',
@@ -31,10 +30,14 @@ export class User {
 
   @Column({ type: 'text', nullable: true })
   career?: string;
+
   @Column({
     type: 'enum',
     enum: UserRole, 
     default: UserRole.PLAYER, 
   })
   role: UserRole;
+
+  @Column({ type: 'boolean', default: true })
+  isActive: boolean;
 }
