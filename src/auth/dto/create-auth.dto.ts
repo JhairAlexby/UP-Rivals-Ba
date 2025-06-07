@@ -8,18 +8,17 @@ import {
 } from 'class-validator';
 import { UserRole } from '../entities/user.entity';
 
-
 export class CreateAuthDto {
-  @IsString({ message: 'Name must be a string.' })
-  @IsNotEmpty({ message: 'Name cannot be empty.' })
+  @IsString()
+  @IsNotEmpty()
   name: string;
 
-  @IsEmail({}, { message: 'The email format is invalid.' })
-  @IsNotEmpty({ message: 'Email cannot be empty.' })
+  @IsEmail()
+  @IsNotEmpty()
   email: string;
 
   @IsString()
-  @IsNotEmpty({ message: 'Password cannot be empty.' })
+  @IsNotEmpty()
   @Matches(
     /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/,
     {
@@ -33,9 +32,10 @@ export class CreateAuthDto {
   @IsNotEmpty()
   phone: string;
 
+  
   @IsEnum(UserRole, {
     message: 'Role must be one of the allowed values: organizer or player.',
   })
-  @IsOptional()
+  @IsOptional() 
   role?: UserRole;
 }
