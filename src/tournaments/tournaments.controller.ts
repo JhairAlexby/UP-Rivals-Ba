@@ -1,4 +1,4 @@
-import { Controller, Post, Body, UseGuards, Get, Param } from '@nestjs/common';
+import { Controller, Post, Body, UseGuards, Get, Param, Patch, Delete } from '@nestjs/common';
 import { TournamentsService } from './tournaments.service';
 import { CreateTournamentDto } from './dto/create-tournament.dto';
 import { AuthGuard } from '@nestjs/passport';
@@ -7,6 +7,7 @@ import { Roles } from 'src/auth/decorators/roles.decorator';
 import { UserRole } from 'src/auth/entities/user.entity';
 import { GetUser } from 'src/auth/decorators/get-user.decorator';
 import { User } from 'src/auth/entities/user.entity';
+import { UpdateTournamentDto } from './dto/update-tournament.dto';
 
 @Controller('tournaments')
 export class TournamentsController {
@@ -22,7 +23,6 @@ export class TournamentsController {
     return this.tournamentsService.create(createTournamentDto, organizer);
   }
 
-
   @Get()
   findAll() {
     return this.tournamentsService.findAll();
@@ -31,5 +31,26 @@ export class TournamentsController {
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.tournamentsService.findOne(id);
+  }
+
+  @Patch(':id')
+  @UseGuards(AuthGuard('jwt'), RolesGuard)
+  @Roles(UserRole.ORGANIZER)
+  update(
+    @Param('id') id: string, 
+    @Body() updateTournamentDto: UpdateTournamentDto,
+    @GetUser() user: User, 
+  ) {
+    return this.tournamentsService.update(id, updateTournamentDto, user);
+  }
+
+  @Delete(':id')
+  @UseGuards(AuthGuard('jwt'), RolesGuard)
+  @Roles(UserRole.ORGANIZER)
+  remove(
+    @Param('id') id: string,
+    @GetUser() user: User, 
+  ) {
+    return this.tournamentsService.remove(id, user);
   }
 }
