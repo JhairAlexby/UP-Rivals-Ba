@@ -4,7 +4,7 @@
 
 # UP-Rivals-Ba
 
-Backend para la plataforma de gestión de torneos deportivos universitarios.
+Backend para la plataforma de gestión de torneos deportivos universitarios de la Universidad Politécnica de Chiapas.
 
 ---
 
@@ -80,14 +80,20 @@ Este endpoint te devolverá el `accessToken` que necesitas para acceder a las ru
 * **Método:** `GET`
 * **URL:** `http://localhost:3000/tournaments/:id`
 
-#### Rutas Protegidas (Requieren rol de Organizador)
+#### Rutas Protegidas
 
 Para todas las siguientes peticiones, debes configurar la autenticación en Postman:
 1.  Ve a la pestaña **`Authorization`**.
 2.  Selecciona `Type`: **`Bearer Token`**.
-3.  Pega el `accessToken` de un usuario con `role: "organizer"`.
+3.  Pega el `accessToken` de un usuario.
 
-##### A. Crear un nuevo torneo
+##### A. Ver mis torneos creados
+* **Método:** `GET`
+* **URL:** `http://localhost:3000/tournaments/my-tournaments`
+* **Nota:** Devuelve todos los torneos creados por el usuario logueado. Funciona para cualquier rol (si un `player` no ha creado torneos, devolverá una lista vacía).
+
+##### B. Crear un nuevo torneo
+* **Requiere rol:** `organizer`
 * **Método:** `POST`
 * **URL:** `http://localhost:3000/tournaments`
 * **Body (raw, JSON):**
@@ -102,7 +108,8 @@ Para todas las siguientes peticiones, debes configurar la autenticación en Post
     }
     ```
 
-##### B. Actualizar un torneo
+##### C. Actualizar un torneo
+* **Requiere rol:** `organizer`
 * **Método:** `PATCH`
 * **URL:** `http://localhost:3000/tournaments/:id`
 * **Nota:** Solo el organizador que creó el torneo puede actualizarlo.
@@ -113,8 +120,8 @@ Para todas las siguientes peticiones, debes configurar la autenticación en Post
     }
     ```
 
-##### C. Eliminar un torneo
+##### D. Eliminar un torneo
+* **Requiere rol:** `organizer`
 * **Método:** `DELETE`
 * **URL:** `http://localhost:3000/tournaments/:id`
 * **Nota:** Solo el organizador que creó el torneo puede eliminarlo.
-

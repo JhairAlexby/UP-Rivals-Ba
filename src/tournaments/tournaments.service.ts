@@ -13,6 +13,7 @@ export class TournamentsService {
     private readonly tournamentRepository: Repository<Tournament>,
   ) {}
 
+
   async create(createTournamentDto: CreateTournamentDto, organizer: User) {
     const newTournament = this.tournamentRepository.create({
       ...createTournamentDto,
@@ -50,6 +51,21 @@ export class TournamentsService {
     
     return tournament;
   }
+  
+  async findTournamentsByOrganizer(user: User) {
+    const tournaments = await this.tournamentRepository.find({
+      where: {
+        organizer: {
+          id: user.id,
+        },
+      },
+    });
+
+    return tournaments.map(tournament => {
+        const { password, ...safeOrganizer } = tournament.organizer;
+        return { ...tournament, organizer: safeOrganizer };
+    });
+  }
 
   async update(id: string, updateTournamentDto: UpdateTournamentDto, user: User) {
     const tournament = await this.tournamentRepository.findOneBy({ id });
@@ -71,10 +87,9 @@ export class TournamentsService {
     }
 
     const savedTournament = await this.tournamentRepository.save(tournamentToUpdate);
-
-  
+    
     const { password, ...safeOrganizer } = tournament.organizer;
-
+    
     return { ...savedTournament, organizer: safeOrganizer };
   }
 

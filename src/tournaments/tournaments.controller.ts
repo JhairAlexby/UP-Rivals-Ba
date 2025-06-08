@@ -27,6 +27,13 @@ export class TournamentsController {
   findAll() {
     return this.tournamentsService.findAll();
   }
+  
+
+  @Get('my-tournaments')
+  @UseGuards(AuthGuard('jwt')) 
+  findMyTournaments(@GetUser() user: User) {
+    return this.tournamentsService.findTournamentsByOrganizer(user);
+  }
 
   @Get(':id')
   findOne(@Param('id') id: string) {
@@ -39,7 +46,7 @@ export class TournamentsController {
   update(
     @Param('id') id: string, 
     @Body() updateTournamentDto: UpdateTournamentDto,
-    @GetUser() user: User, 
+    @GetUser() user: User,
   ) {
     return this.tournamentsService.update(id, updateTournamentDto, user);
   }
@@ -49,7 +56,7 @@ export class TournamentsController {
   @Roles(UserRole.ORGANIZER)
   remove(
     @Param('id') id: string,
-    @GetUser() user: User, 
+    @GetUser() user: User,
   ) {
     return this.tournamentsService.remove(id, user);
   }
