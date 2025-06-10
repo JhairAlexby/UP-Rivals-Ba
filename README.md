@@ -4,7 +4,7 @@
 
 # UP-Rivals-Ba
 
-Backend para la plataforma de gestión de torneos deportivos universitarios.
+Backend para la plataforma de gestión de torneos deportivos universitarios de la Universidad Politécnica de Chiapas.
 
 ---
 
@@ -34,83 +34,94 @@ Sigue estos pasos para levantar el entorno de desarrollo.
 
 ## 2. Guía para Probar Endpoints con Postman
 
-### Rutas Públicas (No requieren autenticación)
+### Módulo de Autenticación (`/auth`)
 
-#### A. Registrar un nuevo usuario
+#### Rutas Públicas
 
+##### A. Registrar un nuevo usuario
 * **Método:** `POST`
 * **URL:** `http://localhost:3000/auth/register`
 * **Body (raw, JSON):**
     ```json
     {
       "name": "Jhair Palacios",
-      "email": "jhair.test@upchiapas.edu.mx",
+      "email": "jhair.organizer@upchiapas.edu.mx",
       "password": "PasswordTest123!",
       "phone": "9612345678",
       "role": "organizer"
     }
     ```
 
-#### B. Iniciar sesión
-
+##### B. Iniciar sesión
 Este endpoint te devolverá el `accessToken` que necesitas para acceder a las rutas protegidas.
-
 * **Método:** `POST`
 * **URL:** `http://localhost:3000/auth/login`
 * **Body (raw, JSON):**
     ```json
     {
-        "email": "jhair.test@upchiapas.edu.mx",
+        "email": "jhair.organizer@upchiapas.edu.mx",
         "password": "PasswordTest123!"
     }
     ```
-* **Respuesta:**
-    ```json
-    {
-        "accessToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOi..."
-    }
-    ```
+
 **¡Copia el `accessToken` para usarlo en los siguientes pasos!**
 
 ---
 
-### Rutas Protegidas (Requieren autenticación)
+### Módulo de Torneos (`/tournaments`)
+
+#### Rutas Públicas
+
+##### A. Listar todos los torneos
+* **Método:** `GET`
+* **URL:** `http://localhost:3000/tournaments`
+
+##### B. Ver un torneo por su ID
+* **Método:** `GET`
+* **URL:** `http://localhost:3000/tournaments/:id`
+
+#### Rutas Protegidas
 
 Para todas las siguientes peticiones, debes configurar la autenticación en Postman:
 1.  Ve a la pestaña **`Authorization`**.
 2.  Selecciona `Type`: **`Bearer Token`**.
-3.  Pega el `accessToken` que copiaste en el campo `Token`.
+3.  Pega el `accessToken` de un usuario.
 
-
-
-#### A. Obtener todos los usuarios
-
+##### A. Ver mis torneos creados
 * **Método:** `GET`
-* **URL:** `http://localhost:3000/auth`
+* **URL:** `http://localhost:3000/tournaments/my-tournaments`
+* **Nota:** Devuelve todos los torneos creados por el usuario logueado. Funciona para cualquier rol (si un `player` no ha creado torneos, devolverá una lista vacía).
 
-#### B. Obtener un usuario por su ID
-
-* **Método:** `GET`
-* **URL:** `http://localhost:3000/auth/:id`
-
-#### C. Modificar un usuario
-
-* **Método:** `PATCH`
-* **URL:** `http://localhost:3000/auth/:id`
-* **Body (raw, JSON):** (Solo incluye los campos que quieras modificar)
+##### B. Crear un nuevo torneo
+* **Requiere rol:** `organizer`
+* **Método:** `POST`
+* **URL:** `http://localhost:3000/tournaments`
+* **Body (raw, JSON):**
     ```json
     {
-      "name": "Jhair Alejandro Cruz Palacios",
-      "phone": "9619876543"
+      "name": "Torneo de Fútbol Rápido",
+      "category": "Fútbol",
+      "modality": "Varonil",
+      "maxTeams": 12,
+      "startDate": "2025-09-01T10:00:00.000Z",
+      "endDate": "2025-09-30T18:00:00.000Z"
     }
     ```
 
-#### D. Eliminar un usuario (Borrado Lógico)
-
+##### C. Actualizar un torneo
+* **Requiere rol:** `organizer`
 * **Método:** `PATCH`
-* **URL:** `http://localhost:3000/auth/soft-delete/:id`
+* **URL:** `http://localhost:3000/tournaments/:id`
+* **Nota:** Solo el organizador que creó el torneo puede actualizarlo.
+* **Body (raw, JSON):** (Solo incluye los campos a modificar)
+    ```json
+    {
+      "name": "GRAN Torneo de Fútbol Rápido 2025"
+    }
+    ```
 
-#### E. Eliminar un usuario (Borrado Físico)
-
+##### D. Eliminar un torneo
+* **Requiere rol:** `organizer`
 * **Método:** `DELETE`
-* **URL:** `http://localhost:3000/auth/:id`
+* **URL:** `http://localhost:3000/tournaments/:id`
+* **Nota:** Solo el organizador que creó el torneo puede eliminarlo.
