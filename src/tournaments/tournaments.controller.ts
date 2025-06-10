@@ -60,4 +60,14 @@ export class TournamentsController {
   ) {
     return this.tournamentsService.remove(id, user);
   }
+
+
+  @Post(':tournamentId/inscribe/:teamId')
+inscribeTeam(
+  @Param('tournamentId') tournamentId: string,
+  @Param('teamId') teamId: string,
+  @GetUser() captain: User,
+) {
+  return this.tournamentsService.inscribeTeam(tournamentId, teamId, captain);
+}
 }

@@ -1,5 +1,6 @@
 import { User } from 'src/auth/entities/user.entity';
-import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import { TournamentInscription } from './tournament-inscription.entity';
 
 @Entity()
 export class Tournament {
@@ -27,9 +28,12 @@ export class Tournament {
   @Column('text', { nullable: true })
   rules?: string;
 
-  @Column('text', { default: 'open' }) // 'open', 'in_progress', 'finished'
+  @Column('text', { default: 'open' })
   status: string;
 
   @ManyToOne(() => User, (user) => user.organizedTournaments, { eager: true })
   organizer: User;
+  
+  @OneToMany(() => TournamentInscription, (inscription) => inscription.tournament)
+  inscriptions: TournamentInscription[];
 }

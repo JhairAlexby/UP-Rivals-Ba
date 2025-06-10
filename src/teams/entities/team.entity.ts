@@ -1,5 +1,7 @@
 import { User } from 'src/auth/entities/user.entity';
-import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import { TournamentInscription } from 'src/tournaments/entities/tournament-inscription.entity';
+import { Column, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import { TeamMember } from './team-member.entity';
 
 @Entity()
 export class Team {
@@ -12,8 +14,12 @@ export class Team {
   @Column('text', { nullable: true })
   logo?: string;
 
-  // --- Relación Clave con User (Capitán) ---
-  // Muchos equipos pueden ser capitaneados por un usuario.
   @ManyToOne(() => User, (user) => user.captainOfTeams, { eager: true })
   captain: User;
+  
+  @OneToMany(() => TeamMember, (teamMember) => teamMember.team)
+  members: TeamMember[];
+
+  @OneToMany(() => TournamentInscription, (inscription) => inscription.team)
+  inscriptions: TournamentInscription[];
 }

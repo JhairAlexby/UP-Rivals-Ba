@@ -1,6 +1,7 @@
+import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 import { Tournament } from 'src/tournaments/entities/tournament.entity';
 import { Team } from 'src/teams/entities/team.entity';
-import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import { TeamMember } from 'src/teams/entities/team-member.entity';
 
 export enum UserRole {
   ORGANIZER = 'organizer',
@@ -44,8 +45,11 @@ export class User {
   isActive: boolean;
 
   @OneToMany(() => Tournament, (tournament) => tournament.organizer)
-organizedTournaments: Tournament[];
+  organizedTournaments: Tournament[];
 
-@OneToMany(() => Team, (team) => team.captain)
-captainOfTeams: Team[];
+  @OneToMany(() => Team, (team) => team.captain)
+  captainOfTeams: Team[];
+
+  @OneToMany(() => TeamMember, (teamMember) => teamMember.user)
+  teams: TeamMember[];
 }
