@@ -72,8 +72,6 @@ Este endpoint te devolverá el `accessToken` que necesitas para acceder a las ru
 
 #### Rutas Protegidas (Requieren autenticación)
 
-Para todas las peticiones en este módulo, debes estar autenticado.
-
 ##### A. Crear un nuevo equipo
 * **Método:** `POST`
 * **URL:** `http://localhost:3000/teams`
@@ -96,7 +94,6 @@ Para todas las peticiones en este módulo, debes estar autenticado.
       "userId": "ID_DEL_JUGADOR_A_AÑADIR"
     }
     ```
-
 ---
 
 ### Módulo de Torneos (`/tournaments`)
@@ -125,8 +122,9 @@ Para todas las siguientes peticiones, debes estar autenticado.
 * **URL:** `http://localhost:3000/tournaments/:tournamentId/inscribe/:teamId`
 * **Nota:** Solo el **capitán** del equipo puede inscribirlo. Debes usar el token del capitán.
 
-##### C. Crear un nuevo torneo
-* **Requiere rol:** `organizer`
+#### Rutas de Organizador (Requieren rol de `organizer`)
+
+##### A. Crear un nuevo torneo
 * **Método:** `POST`
 * **URL:** `http://localhost:3000/tournaments`
 * **Body (raw, JSON):**
@@ -141,15 +139,28 @@ Para todas las siguientes peticiones, debes estar autenticado.
     }
     ```
 
-##### D. Actualizar un torneo
-* **Requiere rol:** `organizer`
+##### B. Actualizar un torneo
 * **Método:** `PATCH`
 * **URL:** `http://localhost:3000/tournaments/:id`
 * **Nota:** Solo el organizador que creó el torneo puede actualizarlo.
 
-##### E. Eliminar un torneo
-* **Requiere rol:** `organizer`
+##### C. Eliminar un torneo
 * **Método:** `DELETE`
 * **URL:** `http://localhost:3000/tournaments/:id`
 * **Nota:** Solo el organizador que creó el torneo puede eliminarlo.
 
+##### D. Ver solicitudes de inscripción
+* **Método:** `GET`
+* **URL:** `http://localhost:3000/tournaments/:tournamentId/inscriptions`
+* **Nota:** Solo el organizador del torneo puede ver las solicitudes.
+
+##### E. Aprobar/Rechazar una inscripción
+* **Método:** `PATCH`
+* **URL:** `http://localhost:3000/tournaments/:tournamentId/inscriptions/:teamId`
+* **Nota:** Solo el organizador del torneo puede gestionar las solicitudes.
+* **Body (raw, JSON):**
+    ```json
+    {
+      "status": "approved"
+    }
+    ```
