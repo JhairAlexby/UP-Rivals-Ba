@@ -3,6 +3,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AuthModule } from './auth/auth.module';
 import { TournamentsModule } from './tournaments/tournaments.module';
+import { TeamsModule } from './teams/teams.module';
 
 @Module({
   imports: [
@@ -29,6 +30,8 @@ import { TournamentsModule } from './tournaments/tournaments.module';
     AuthModule,
 
     TournamentsModule,
+
+    TeamsModule,
 
   ], 
 })

@@ -68,6 +68,37 @@ Este endpoint te devolverá el `accessToken` que necesitas para acceder a las ru
 
 ---
 
+### Módulo de Equipos (`/teams`)
+
+#### Rutas Protegidas (Requieren autenticación)
+
+Para todas las peticiones en este módulo, debes estar autenticado.
+
+##### A. Crear un nuevo equipo
+* **Método:** `POST`
+* **URL:** `http://localhost:3000/teams`
+* **Nota:** Cualquier usuario autenticado (`player` u `organizer`) puede crear un equipo.
+* **Body (raw, JSON):**
+    ```json
+    {
+      "name": "Los Halcones de Chiapas",
+      "logo": "[https://i.imgur.com/some-logo.png](https://i.imgur.com/some-logo.png)"
+    }
+    ```
+
+##### B. Añadir un miembro a un equipo
+* **Método:** `POST`
+* **URL:** `http://localhost:3000/teams/:teamId/members`
+* **Nota:** Solo el **capitán** del equipo puede añadir miembros. Debes usar el token del capitán.
+* **Body (raw, JSON):**
+    ```json
+    {
+      "userId": "ID_DEL_JUGADOR_A_AÑADIR"
+    }
+    ```
+
+---
+
 ### Módulo de Torneos (`/tournaments`)
 
 #### Rutas Públicas
@@ -82,17 +113,19 @@ Este endpoint te devolverá el `accessToken` que necesitas para acceder a las ru
 
 #### Rutas Protegidas
 
-Para todas las siguientes peticiones, debes configurar la autenticación en Postman:
-1.  Ve a la pestaña **`Authorization`**.
-2.  Selecciona `Type`: **`Bearer Token`**.
-3.  Pega el `accessToken` de un usuario.
+Para todas las siguientes peticiones, debes estar autenticado.
 
 ##### A. Ver mis torneos creados
 * **Método:** `GET`
 * **URL:** `http://localhost:3000/tournaments/my-tournaments`
-* **Nota:** Devuelve todos los torneos creados por el usuario logueado. Funciona para cualquier rol (si un `player` no ha creado torneos, devolverá una lista vacía).
+* **Nota:** Devuelve todos los torneos creados por el usuario logueado.
 
-##### B. Crear un nuevo torneo
+##### B. Inscribir un equipo a un torneo
+* **Método:** `POST`
+* **URL:** `http://localhost:3000/tournaments/:tournamentId/inscribe/:teamId`
+* **Nota:** Solo el **capitán** del equipo puede inscribirlo. Debes usar el token del capitán.
+
+##### C. Crear un nuevo torneo
 * **Requiere rol:** `organizer`
 * **Método:** `POST`
 * **URL:** `http://localhost:3000/tournaments`
@@ -108,20 +141,15 @@ Para todas las siguientes peticiones, debes configurar la autenticación en Post
     }
     ```
 
-##### C. Actualizar un torneo
+##### D. Actualizar un torneo
 * **Requiere rol:** `organizer`
 * **Método:** `PATCH`
 * **URL:** `http://localhost:3000/tournaments/:id`
 * **Nota:** Solo el organizador que creó el torneo puede actualizarlo.
-* **Body (raw, JSON):** (Solo incluye los campos a modificar)
-    ```json
-    {
-      "name": "GRAN Torneo de Fútbol Rápido 2025"
-    }
-    ```
 
-##### D. Eliminar un torneo
+##### E. Eliminar un torneo
 * **Requiere rol:** `organizer`
 * **Método:** `DELETE`
 * **URL:** `http://localhost:3000/tournaments/:id`
 * **Nota:** Solo el organizador que creó el torneo puede eliminarlo.
+
