@@ -113,15 +113,29 @@ Para todas las siguientes peticiones, debes configurar la autenticación en Post
 * **Método:** `PATCH`
 * **URL:** `http://localhost:3000/tournaments/:id`
 * **Nota:** Solo el organizador que creó el torneo puede actualizarlo.
-* **Body (raw, JSON):** (Solo incluye los campos a modificar)
-    ```json
-    {
-      "name": "GRAN Torneo de Fútbol Rápido 2025"
-    }
-    ```
 
 ##### D. Eliminar un torneo
 * **Requiere rol:** `organizer`
 * **Método:** `DELETE`
 * **URL:** `http://localhost:3000/tournaments/:id`
 * **Nota:** Solo el organizador que creó el torneo puede eliminarlo.
+
+---
+
+### Módulo de Equipos (`/teams`)
+
+#### Rutas Protegidas
+
+Para todas las peticiones en este módulo, debes estar autenticado.
+
+##### A. Crear un nuevo equipo
+* **Método:** `POST`
+* **URL:** `http://localhost:3000/teams`
+* **Nota:** Cualquier usuario autenticado (`player` u `organizer`) puede crear un equipo.
+* **Body (raw, JSON):**
+    ```json
+    {
+      "name": "Los Halcones de Chiapas",
+      "logo": "[https://i.imgur.com/some-logo.png](https://i.imgur.com/some-logo.png)"
+    }
+    ```

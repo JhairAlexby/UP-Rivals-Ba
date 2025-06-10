@@ -1,4 +1,5 @@
 import { Tournament } from 'src/tournaments/entities/tournament.entity';
+import { Team } from 'src/teams/entities/team.entity';
 import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 
 export enum UserRole {
@@ -44,4 +45,7 @@ export class User {
 
   @OneToMany(() => Tournament, (tournament) => tournament.organizer)
 organizedTournaments: Tournament[];
+
+@OneToMany(() => Team, (team) => team.captain)
+captainOfTeams: Team[];
 }
