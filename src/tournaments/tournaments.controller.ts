@@ -28,9 +28,8 @@ export class TournamentsController {
     return this.tournamentsService.findAll();
   }
   
-
   @Get('my-tournaments')
-  @UseGuards(AuthGuard('jwt')) 
+  @UseGuards(AuthGuard('jwt'))
   findMyTournaments(@GetUser() user: User) {
     return this.tournamentsService.findTournamentsByOrganizer(user);
   }
@@ -61,13 +60,14 @@ export class TournamentsController {
     return this.tournamentsService.remove(id, user);
   }
 
-
+  // Añadimos el guardia de autenticación para proteger la ruta
   @Post(':tournamentId/inscribe/:teamId')
-inscribeTeam(
-  @Param('tournamentId') tournamentId: string,
-  @Param('teamId') teamId: string,
-  @GetUser() captain: User,
-) {
-  return this.tournamentsService.inscribeTeam(tournamentId, teamId, captain);
-}
+  @UseGuards(AuthGuard('jwt'))
+  inscribeTeam(
+    @Param('tournamentId') tournamentId: string,
+    @Param('teamId') teamId: string,
+    @GetUser() captain: User,
+  ) {
+    return this.tournamentsService.inscribeTeam(tournamentId, teamId, captain);
+  }
 }
