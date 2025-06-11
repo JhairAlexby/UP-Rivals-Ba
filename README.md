@@ -103,6 +103,14 @@ Para facilitar las pruebas, puedes usar el Seeder para limpiar la base de datos 
 * **Método:** `GET`
 * **URL:** `http://localhost:3000/tournaments/:id`
 
+##### C. Ver la tabla de posiciones de un torneo
+* **Método:** `GET`
+* **URL:** `http://localhost:3000/tournaments/:id/standings`
+
+##### D. Ver los partidos de un torneo
+* **Método:** `GET`
+* **URL:** `http://localhost:3000/tournaments/:id/matches`
+
 #### Rutas Protegidas
 
 Para las siguientes peticiones, asegúrate de añadir el `Bearer Token` en la pestaña `Authorization`.

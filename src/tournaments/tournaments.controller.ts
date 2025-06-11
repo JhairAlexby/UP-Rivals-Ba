@@ -80,4 +80,21 @@ export class TournamentsController {
   generateSchedule(@Param('id') tournamentId: string, @GetUser() user: User) {
     return this.tournamentsService.generateSchedule(tournamentId, user);
   }
+
+  @Get(':id/standings')
+  getStandings(@Param('id') tournamentId: string) {
+    return this.tournamentsService.getStandings(tournamentId);
+  }
+
+
+  // --- Endpoint público para ver los partidos de un torneo ---
+  @Get(':id/matches')
+  getMatches(@Param('id') tournamentId: string) {
+    return this.tournamentsService.getMatches(tournamentId);
+  }
+
+  
+
+  
+
 }
