@@ -32,7 +32,19 @@ Sigue estos pasos para levantar el entorno de desarrollo.
     ```
 ---
 
-## 2. Guía para Probar Endpoints con Postman
+## 2. Herramientas de Desarrollo
+
+### Seeder (Poblar Base de Datos con Datos de Prueba)
+
+Para facilitar las pruebas, puedes usar el Seeder para limpiar la base de datos y llenarla con un conjunto de datos predefinidos (1 organizador, 4 jugadores, 1 torneo, 4 equipos inscritos y 3 de ellos aprobados).
+
+* **Método:** `POST`
+* **URL:** `http://localhost:3000/seed/execute`
+* **Nota:** Este endpoint no requiere autorización ni cuerpo (body).
+
+---
+
+## 3. Guía para Probar Endpoints con Postman
 
 ### Módulo de Autenticación (`/auth`)
 
@@ -41,20 +53,19 @@ Sigue estos pasos para levantar el entorno de desarrollo.
 ##### A. Registrar un nuevo usuario
 * **Método:** `POST`
 * **URL:** `http://localhost:3000/auth/register`
-* **Body (raw, JSON):**
-    ```json
-    {
-      "name": "Jhair Palacios",
-      "email": "jhair.organizer@upchiapas.edu.mx",
-      "password": "PasswordTest123!",
-      "phone": "9612345678",
-      "role": "organizer"
-    }
-    ```
 
 ##### B. Iniciar sesión
 * **Método:** `POST`
 * **URL:** `http://localhost:3000/auth/login`
+* **Body (raw, JSON):** (Usa las credenciales del Seeder para pruebas)
+    ```json
+    {
+        "email": "organizer@upchiapas.edu.mx",
+        "password": "PasswordTest123!"
+    }
+    ```
+
+**¡Copia el `accessToken` para usarlo en los siguientes pasos!**
 
 ---
 
@@ -68,8 +79,8 @@ Sigue estos pasos para levantar el entorno de desarrollo.
 * **Body (raw, JSON):**
     ```json
     {
-      "name": "Los Halcones de Chiapas",
-      "logo": "[https://i.imgur.com/some-logo.png](https://i.imgur.com/some-logo.png)"
+      "name": "Los Gladiadores",
+      "logo": "[https://i.imgur.com/logo-gladiadores.png](https://i.imgur.com/logo-gladiadores.png)"
     }
     ```
 
@@ -92,7 +103,9 @@ Sigue estos pasos para levantar el entorno de desarrollo.
 * **Método:** `GET`
 * **URL:** `http://localhost:3000/tournaments/:id`
 
-#### Rutas Protegidas (Requieren autenticación)
+#### Rutas Protegidas
+
+Para las siguientes peticiones, asegúrate de añadir el `Bearer Token` en la pestaña `Authorization`.
 
 ##### A. Ver mis torneos creados
 * **Método:** `GET`
@@ -101,20 +114,35 @@ Sigue estos pasos para levantar el entorno de desarrollo.
 ##### B. Inscribir un equipo a un torneo
 * **Método:** `POST`
 * **URL:** `http://localhost:3000/tournaments/:tournamentId/inscribe/:teamId`
+* **Nota:** Solo el **capitán** del equipo puede inscribirlo.
 
-##### C. Ver solicitudes de inscripción
-* **Requiere rol:** `organizer`
+#### Rutas de Organizador (Requieren rol de `organizer`)
+
+##### A. Crear un nuevo torneo
+* **Método:** `POST`
+* **URL:** `http://localhost:3000/tournaments`
+
+##### B. Actualizar un torneo
+* **Método:** `PATCH`
+* **URL:** `http://localhost:3000/tournaments/:id`
+
+##### C. Eliminar un torneo
+* **Método:** `DELETE`
+* **URL:** `http://localhost:3000/tournaments/:id`
+
+##### D. Ver solicitudes de inscripción de un torneo
 * **Método:** `GET`
 * **URL:** `http://localhost:3000/tournaments/:tournamentId/inscriptions`
 
-##### D. Aprobar/Rechazar una inscripción
-* **Requiere rol:** `organizer`
+##### E. Aprobar/Rechazar una inscripción
 * **Método:** `PATCH`
 * **URL:** `http://localhost:3000/tournaments/:tournamentId/inscriptions/:teamId`
-* **Body (raw, JSON):**
-    ```json
-    { "status": "approved" }
-    ```
+* **Body (raw, JSON):** `{"status": "approved"}`
+
+##### F. Generar calendario de partidos automáticamente
+* **Método:** `POST`
+* **URL:** `http://localhost:3000/tournaments/:id/generate-schedule`
+* **Nota:** Genera un calendario "todos contra todos" (Round Robin) con los equipos aprobados en el torneo.
 
 ---
 
@@ -122,10 +150,9 @@ Sigue estos pasos para levantar el entorno de desarrollo.
 
 #### Rutas Protegidas (Requieren rol de `organizer`)
 
-##### A. Crear un nuevo partido (enfrentamiento)
+##### A. Crear un partido manualmente
 * **Método:** `POST`
 * **URL:** `http://localhost:3000/matches`
-* **Nota:** Solo el organizador del torneo puede crear partidos.
 * **Body (raw, JSON):**
     ```json
     {
@@ -138,8 +165,7 @@ Sigue estos pasos para levantar el entorno de desarrollo.
 
 ##### B. Registrar el resultado de un partido
 * **Método:** `PATCH`
-* **URL:** `http://localhost:3000/matches/:idDelEnfrentamiento/result`
-* **Nota:** Solo el organizador del torneo puede registrar resultados.
+* **URL:** `http://localhost:3000/matches/:id/result`
 * **Body (raw, JSON):**
     ```json
     {

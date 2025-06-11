@@ -13,6 +13,7 @@ import { TeamMember } from './teams/entities/team-member.entity';
 import { Tournament } from './tournaments/entities/tournament.entity';
 import { TournamentInscription } from './tournaments/entities/tournament-inscription.entity';
 import { Match } from './matches/entities/match.entity';
+import { SeedModule } from './seed/seed.module';
 
 @Module({
   imports: [
@@ -42,6 +43,7 @@ import { Match } from './matches/entities/match.entity';
     TournamentsModule,
     TeamsModule,
     MatchesModule,
+    SeedModule,
 
   ], 
 })
