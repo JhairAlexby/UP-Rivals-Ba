@@ -1,6 +1,7 @@
 import { User } from 'src/auth/entities/user.entity';
 import { Column, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 import { TournamentInscription } from './tournament-inscription.entity';
+import { Match } from 'src/matches/entities/match.entity'; 
 
 @Entity()
 export class Tournament {
@@ -33,7 +34,10 @@ export class Tournament {
 
   @ManyToOne(() => User, (user) => user.organizedTournaments, { eager: true })
   organizer: User;
-  
+
   @OneToMany(() => TournamentInscription, (inscription) => inscription.tournament)
   inscriptions: TournamentInscription[];
+
+  @OneToMany(() => Match, (match) => match.tournament)
+  matches: Match[];
 }

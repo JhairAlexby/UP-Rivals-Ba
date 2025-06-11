@@ -53,18 +53,8 @@ Sigue estos pasos para levantar el entorno de desarrollo.
     ```
 
 ##### B. Iniciar sesión
-Este endpoint te devolverá el `accessToken` que necesitas para acceder a las rutas protegidas.
 * **Método:** `POST`
 * **URL:** `http://localhost:3000/auth/login`
-* **Body (raw, JSON):**
-    ```json
-    {
-        "email": "jhair.organizer@upchiapas.edu.mx",
-        "password": "PasswordTest123!"
-    }
-    ```
-
-**¡Copia el `accessToken` para usarlo en los siguientes pasos!**
 
 ---
 
@@ -75,7 +65,6 @@ Este endpoint te devolverá el `accessToken` que necesitas para acceder a las ru
 ##### A. Crear un nuevo equipo
 * **Método:** `POST`
 * **URL:** `http://localhost:3000/teams`
-* **Nota:** Cualquier usuario autenticado (`player` u `organizer`) puede crear un equipo.
 * **Body (raw, JSON):**
     ```json
     {
@@ -87,13 +76,8 @@ Este endpoint te devolverá el `accessToken` que necesitas para acceder a las ru
 ##### B. Añadir un miembro a un equipo
 * **Método:** `POST`
 * **URL:** `http://localhost:3000/teams/:teamId/members`
-* **Nota:** Solo el **capitán** del equipo puede añadir miembros. Debes usar el token del capitán.
-* **Body (raw, JSON):**
-    ```json
-    {
-      "userId": "ID_DEL_JUGADOR_A_AÑADIR"
-    }
-    ```
+* **Nota:** Solo el **capitán** del equipo puede añadir miembros.
+
 ---
 
 ### Módulo de Torneos (`/tournaments`)
@@ -108,59 +92,58 @@ Este endpoint te devolverá el `accessToken` que necesitas para acceder a las ru
 * **Método:** `GET`
 * **URL:** `http://localhost:3000/tournaments/:id`
 
-#### Rutas Protegidas
-
-Para todas las siguientes peticiones, debes estar autenticado.
+#### Rutas Protegidas (Requieren autenticación)
 
 ##### A. Ver mis torneos creados
 * **Método:** `GET`
 * **URL:** `http://localhost:3000/tournaments/my-tournaments`
-* **Nota:** Devuelve todos los torneos creados por el usuario logueado.
 
 ##### B. Inscribir un equipo a un torneo
 * **Método:** `POST`
 * **URL:** `http://localhost:3000/tournaments/:tournamentId/inscribe/:teamId`
-* **Nota:** Solo el **capitán** del equipo puede inscribirlo. Debes usar el token del capitán.
 
-#### Rutas de Organizador (Requieren rol de `organizer`)
+##### C. Ver solicitudes de inscripción
+* **Requiere rol:** `organizer`
+* **Método:** `GET`
+* **URL:** `http://localhost:3000/tournaments/:tournamentId/inscriptions`
 
-##### A. Crear un nuevo torneo
+##### D. Aprobar/Rechazar una inscripción
+* **Requiere rol:** `organizer`
+* **Método:** `PATCH`
+* **URL:** `http://localhost:3000/tournaments/:tournamentId/inscriptions/:teamId`
+* **Body (raw, JSON):**
+    ```json
+    { "status": "approved" }
+    ```
+
+---
+
+### Módulo de Partidos (`/matches`)
+
+#### Rutas Protegidas (Requieren rol de `organizer`)
+
+##### A. Crear un nuevo partido (enfrentamiento)
 * **Método:** `POST`
-* **URL:** `http://localhost:3000/tournaments`
+* **URL:** `http://localhost:3000/matches`
+* **Nota:** Solo el organizador del torneo puede crear partidos.
 * **Body (raw, JSON):**
     ```json
     {
-      "name": "Torneo de Fútbol Rápido",
-      "category": "Fútbol",
-      "modality": "Varonil",
-      "maxTeams": 12,
-      "startDate": "2025-09-01T10:00:00.000Z",
-      "endDate": "2025-09-30T18:00:00.000Z"
+      "tournamentId": "ID_DEL_TORNEO",
+      "teamAId": "ID_DEL_EQUIPO_A",
+      "teamBId": "ID_DEL_EQUIPO_B",
+      "date": "2025-10-20T19:00:00.000Z"
     }
     ```
 
-##### B. Actualizar un torneo
+##### B. Registrar el resultado de un partido
 * **Método:** `PATCH`
-* **URL:** `http://localhost:3000/tournaments/:id`
-* **Nota:** Solo el organizador que creó el torneo puede actualizarlo.
-
-##### C. Eliminar un torneo
-* **Método:** `DELETE`
-* **URL:** `http://localhost:3000/tournaments/:id`
-* **Nota:** Solo el organizador que creó el torneo puede eliminarlo.
-
-##### D. Ver solicitudes de inscripción
-* **Método:** `GET`
-* **URL:** `http://localhost:3000/tournaments/:tournamentId/inscriptions`
-* **Nota:** Solo el organizador del torneo puede ver las solicitudes.
-
-##### E. Aprobar/Rechazar una inscripción
-* **Método:** `PATCH`
-* **URL:** `http://localhost:3000/tournaments/:tournamentId/inscriptions/:teamId`
-* **Nota:** Solo el organizador del torneo puede gestionar las solicitudes.
+* **URL:** `http://localhost:3000/matches/:idDelEnfrentamiento/result`
+* **Nota:** Solo el organizador del torneo puede registrar resultados.
 * **Body (raw, JSON):**
     ```json
     {
-      "status": "approved"
+      "teamAScore": 3,
+      "teamBScore": 2
     }
     ```
