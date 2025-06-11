@@ -1,4 +1,5 @@
 import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import { Exclude } from 'class-transformer'; // <-- ¡IMPORTACIÓN AÑADIDA!
 import { Tournament } from 'src/tournaments/entities/tournament.entity';
 import { Team } from 'src/teams/entities/team.entity';
 import { TeamMember } from 'src/teams/entities/team-member.entity';
@@ -19,6 +20,7 @@ export class User {
   @Column('text')
   name: string;
 
+  @Exclude() 
   @Column('text')
   password: string;
 
@@ -34,11 +36,7 @@ export class User {
   @Column({ type: 'text', nullable: true })
   career?: string;
 
-  @Column({
-    type: 'enum',
-    enum: UserRole, 
-    default: UserRole.PLAYER, 
-  })
+  @Column({ type: 'enum', enum: UserRole, default: UserRole.PLAYER })
   role: UserRole;
 
   @Column({ type: 'boolean', default: true })

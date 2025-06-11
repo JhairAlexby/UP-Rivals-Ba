@@ -4,6 +4,16 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { AuthModule } from './auth/auth.module';
 import { TournamentsModule } from './tournaments/tournaments.module';
 import { TeamsModule } from './teams/teams.module';
+import { MatchesModule } from './matches/matches.module';
+
+
+import { User } from './auth/entities/user.entity';
+import { Team } from './teams/entities/team.entity';
+import { TeamMember } from './teams/entities/team-member.entity';
+import { Tournament } from './tournaments/entities/tournament.entity';
+import { TournamentInscription } from './tournaments/entities/tournament-inscription.entity';
+import { Match } from './matches/entities/match.entity';
+import { SeedModule } from './seed/seed.module';
 
 @Module({
   imports: [
@@ -11,7 +21,6 @@ import { TeamsModule } from './teams/teams.module';
       isGlobal: true,
     }),
 
-    
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
@@ -22,16 +31,19 @@ import { TeamsModule } from './teams/teams.module';
         database: configService.get<string>('DB_NAME'),
         username: configService.get<string>('DB_USERNAME'),
         password: configService.get<string>('DB_PASSWORD'),
-        autoLoadEntities: true,
+        
+        
+        entities: [ User, Team, TeamMember, Tournament, TournamentInscription, Match ],
+        
         synchronize: true, 
       }),
     }),
 
     AuthModule,
-
     TournamentsModule,
-
     TeamsModule,
+    MatchesModule,
+    SeedModule,
 
   ], 
 })
