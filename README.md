@@ -1,184 +1,155 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-</p>
-
-# UP-Rivals-Ba
-
+UP-Rivals-Ba
 Backend para la plataforma de gestión de torneos deportivos universitarios de la Universidad Politécnica de Chiapas.
 
----
-
-## 1. Configuración Inicial
-
+1. Configuración Inicial
 Sigue estos pasos para levantar el entorno de desarrollo.
 
-1.  **Levantar la base de datos**
-    ```bash
-    docker-compose up -d
-    ```
+Levantar la base de datos
 
-2.  **Instalar dependencias**
-    ```bash
-    npm install
-    ```
+docker-compose up -d
 
-3.  **Configurar variables de entorno**
-    * Clona el archivo `env.template` y renómbralo a `.env`.
-    * Llena todas las variables requeridas en el archivo `.env` (credenciales de la base de datos y `JWT_SECRET`).
 
-4.  **Ejecutar la aplicación**
-    ```bash
-    npm run start:dev
-    ```
----
+Instalar dependencias
 
-## 2. Herramientas de Desarrollo
+npm install
 
-### Seeder (Poblar Base de Datos con Datos de Prueba)
 
+Configurar variables de entorno
+
+Clona el archivo env.template y renómbralo a .env.
+
+Llena todas las variables requeridas en el archivo .env (credenciales de la base de datos, JWT_SECRET y las credenciales de CLOUDINARY).
+
+Ejecutar la aplicación
+
+npm run start:dev
+
+
+2. Herramientas de Desarrollo
+Seeder (Poblar Base de Datos con Datos de Prueba)
 Para facilitar las pruebas, puedes usar el Seeder para limpiar la base de datos y llenarla con un conjunto de datos predefinidos (1 organizador, 4 jugadores, 1 torneo, 4 equipos inscritos y 3 de ellos aprobados).
 
-* **Método:** `POST`
-* **URL:** `http://localhost:3000/seed/execute`
-* **Nota:** Este endpoint no requiere autorización ni cuerpo (body).
+Método: POST
 
----
+URL: http://localhost:3000/seed/execute
 
-## 3. Guía para Probar Endpoints con Postman
+Nota: Este endpoint no requiere autorización ni cuerpo (body).
 
-### Módulo de Autenticación (`/auth`)
+3. Guía para Probar Endpoints con Postman
+Módulo de Autenticación (/auth)
+Rutas Públicas
+A. Registrar un nuevo usuario
+Método: POST
 
-#### Rutas Públicas
+URL: http://localhost:3000/auth/register
 
-##### A. Registrar un nuevo usuario
-* **Método:** `POST`
-* **URL:** `http://localhost:3000/auth/register`
+Body (raw, JSON):
 
-##### B. Iniciar sesión
-* **Método:** `POST`
-* **URL:** `http://localhost:3000/auth/login`
-* **Body (raw, JSON):** (Usa las credenciales del Seeder para pruebas)
-    ```json
-    {
-        "email": "organizer@upchiapas.edu.mx",
-        "password": "PasswordTest123!"
-    }
-    ```
+{
+    "name": "Jhair Palacios",
+    "email": "jhair.player@upchiapas.edu.mx",
+    "password": "PasswordTest123!",
+    "phone": "9612345678",
+    "role": "player or organizer"
+}
 
-**¡Copia el `accessToken` para usarlo en los siguientes pasos!**
+B. Iniciar sesión
+Método: POST
 
----
+URL: http://localhost:3000/auth/login
 
-### Módulo de Equipos (`/teams`)
+Body (raw, JSON): (Usa las credenciales del Seeder para pruebas)
 
-#### Rutas Protegidas (Requieren autenticación)
-
-##### A. Crear un nuevo equipo
-* **Método:** `POST`
-* **URL:** `http://localhost:3000/teams`
-* **Body (raw, JSON):**
-    ```json
-    {
-      "name": "Los Gladiadores",
-      "logo": "[https://i.imgur.com/logo-gladiadores.png](https://i.imgur.com/logo-gladiadores.png)"
-    }
-    ```
-
-##### B. Añadir un miembro a un equipo
-* **Método:** `POST`
-* **URL:** `http://localhost:3000/teams/:teamId/members`
-* **Nota:** Solo el **capitán** del equipo puede añadir miembros.
-
----
-
-### Módulo de Torneos (`/tournaments`)
-
-#### Rutas Públicas
-
-##### A. Listar todos los torneos
-* **Método:** `GET`
-* **URL:** `http://localhost:3000/tournaments`
-
-##### B. Ver un torneo por su ID
-* **Método:** `GET`
-* **URL:** `http://localhost:3000/tournaments/:id`
-
-##### C. Ver la tabla de posiciones de un torneo
-* **Método:** `GET`
-* **URL:** `http://localhost:3000/tournaments/:id/standings`
-
-##### D. Ver los partidos de un torneo
-* **Método:** `GET`
-* **URL:** `http://localhost:3000/tournaments/:id/matches`
+{
+    "email": "organizer@upchiapas.edu.mx",
+    "password": "PasswordTest123!"
+}
 
 
-#### Rutas Protegidas
+¡Copia el accessToken para usarlo en los siguientes pasos!
 
-Para las siguientes peticiones, asegúrate de añadir el `Bearer Token` en la pestaña `Authorization`.
+Módulo de Subida de Archivos (/files)
+Este módulo se encarga de recibir imágenes y subirlas a la nube (Cloudinary).
 
-##### A. Ver mis torneos creados
-* **Método:** `GET`
-* **URL:** `http://localhost:3000/tournaments/my-tournaments`
+A. Subir una imagen
+Método: POST
 
-##### B. Inscribir un equipo a un torneo
-* **Método:** `POST`
-* **URL:** `http://localhost:3000/tournaments/:tournamentId/inscribe/:teamId`
-* **Nota:** Solo el **capitán** del equipo puede inscribirlo.
+URL: http://localhost:3000/files/upload
 
-#### Rutas de Organizador (Requieren rol de `organizer`)
+Body: form-data
 
-##### A. Crear un nuevo torneo
-* **Método:** `POST`
-* **URL:** `http://localhost:3000/tournaments`
+Key: file
 
-##### B. Actualizar un torneo
-* **Método:** `PATCH`
-* **URL:** `http://localhost:3000/tournaments/:id`
+Value: (Selecciona un archivo de imagen)
 
-##### C. Eliminar un torneo
-* **Método:** `DELETE`
-* **URL:** `http://localhost:3000/tournaments/:id`
+Respuesta:
 
-##### D. Ver solicitudes de inscripción de un torneo
-* **Método:** `GET`
-* **URL:** `http://localhost:3000/tournaments/:tournamentId/inscriptions`
+{
+  "secure_url": "https://res.cloudinary.com/.../imagen.jpg"
+}
 
-##### E. Aprobar/Rechazar una inscripción
-* **Método:** `PATCH`
-* **URL:** `http://localhost:3000/tournaments/:tournamentId/inscriptions/:teamId`
-* **Body (raw, JSON):** `{"status": "approved"}`
 
-##### F. Generar calendario de partidos automáticamente
-* **Método:** `POST`
-* **URL:** `http://localhost:3000/tournaments/:id/generate-schedule`
-* **Nota:** Genera un calendario "todos contra todos" (Round Robin) con los equipos aprobados en el torneo.
+Nota: La secure_url devuelta se debe usar para actualizar las fotos de perfil o logos de equipo.
 
----
+Módulo de Equipos (/teams)
+Rutas Protegidas (Requieren autenticación)
+A. Crear un nuevo equipo
+Método: POST
 
-### Módulo de Partidos (`/matches`)
+URL: http://localhost:3000/teams
 
-#### Rutas Protegidas (Requieren rol de `organizer`)
+Body (raw, JSON):
 
-##### A. Crear un partido manualmente
-* **Método:** `POST`
-* **URL:** `http://localhost:3000/matches`
-* **Body (raw, JSON):**
-    ```json
-    {
-      "tournamentId": "ID_DEL_TORNEO",
-      "teamAId": "ID_DEL_EQUIPO_A",
-      "teamBId": "ID_DEL_EQUIPO_B",
-      "date": "2025-10-20T19:00:00.000Z"
-    }
-    ```
+{
+  "name": "Los Gladiadores",
+  "logo": "URL_OBTENIDA_DE_/files/upload"
+}
 
-##### B. Registrar el resultado de un partido
-* **Método:** `PATCH`
-* **URL:** `http://localhost:3000/matches/:id/result`
-* **Body (raw, JSON):**
-    ```json
-    {
-      "teamAScore": 3,
-      "teamBScore": 2
-    }
-    ```
+
+B. Añadir un miembro a un equipo
+Método: POST
+
+URL: http://localhost:3000/teams/:teamId/members
+
+Nota: Solo el capitán del equipo puede añadir miembros.
+
+C. Actualizar un equipo
+Método: PATCH
+
+URL: http://localhost:3000/teams/:id
+
+Nota: Solo el capitán del equipo puede actualizarlo.
+
+Módulo de Torneos (/tournaments)
+Rutas Públicas
+Listar todos los torneos: GET /tournaments
+
+Ver un torneo por su ID: GET /tournaments/:id
+
+Ver la tabla de posiciones de un torneo: GET /tournaments/:id/standings
+
+Ver los partidos de un torneo: GET /tournaments/:id/matches
+
+Rutas Protegidas
+Ver mis torneos creados: GET /tournaments/my-tournaments
+
+Inscribir un equipo a un torneo: POST /tournaments/:tournamentId/inscribe/:teamId (Solo el capitán)
+
+Rutas de Organizador (Requieren rol de organizer)
+Crear un nuevo torneo: POST /tournaments
+
+Actualizar un torneo: PATCH /tournaments/:id
+
+Eliminar un torneo: DELETE /tournaments/:id
+
+Ver solicitudes de inscripción: GET /tournaments/:tournamentId/inscriptions
+
+Aprobar/Rechazar una inscripción: PATCH /tournaments/:tournamentId/inscriptions/:teamId
+
+Generar calendario automático: POST /tournaments/:id/generate-schedule
+
+Módulo de Partidos (/matches)
+Rutas Protegidas (Requieren rol de organizer)
+Crear un partido manually: POST /matches
+
+Registrar el resultado de un partido: PATCH /matches/:id/result
