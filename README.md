@@ -111,6 +111,7 @@ Para facilitar las pruebas, puedes usar el Seeder para limpiar la base de datos 
 * **Método:** `GET`
 * **URL:** `http://localhost:3000/tournaments/:id/matches`
 
+
 #### Rutas Protegidas
 
 Para las siguientes peticiones, asegúrate de añadir el `Bearer Token` en la pestaña `Authorization`.
