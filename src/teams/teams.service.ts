@@ -2,6 +2,7 @@ import { Injectable, ConflictException, NotFoundException, ForbiddenException, I
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { CreateTeamDto } from './dto/create-team.dto';
+import { UpdateTeamDto } from './dto/update-team.dto';
 import { Team } from './entities/team.entity';
 import { User } from 'src/auth/entities/user.entity';
 import { TeamMember } from './entities/team-member.entity';
@@ -17,40 +18,42 @@ export class TeamsService {
 
   async create(createTeamDto: CreateTeamDto, captain: User) {
     const existingTeam = await this.teamRepository.findOneBy({ name: createTeamDto.name });
-    if (existingTeam) throw new ConflictException(`A team with the name "${createTeamDto.name}" already exists.`);
+    if (existingTeam) {
+      throw new ConflictException(`Un equipo con el nombre "${createTeamDto.name}" ya existe.`);
+    }
+
     const newTeam = this.teamRepository.create({ ...createTeamDto, captain });
-    await this.teamRepository.save(newTeam);
-    const { password, ...safeCaptain } = captain;
-    return { ...newTeam, captain: safeCaptain };
+    return this.teamRepository.save(newTeam);
   }
 
-  // --- CORRECCIÓN DEFINITIVA ---
   async addMember(teamId: string, addMemberDto: AddMemberDto, captain: User) {
-    const team = await this.teamRepository
-      .createQueryBuilder('team')
-      .innerJoinAndSelect('team.captain', 'captainUser')
-      .where('team.id = :id', { id: teamId })
-      .getOne();
-      
-    // Línea de depuración para ver qué se obtiene
-    console.log('EQUIPO ENCONTRADO EN addMember:', JSON.stringify(team, null, 2));
-    
-    if (!team) throw new NotFoundException('Team not found');
-
-    if (!team.captain) {
-        throw new InternalServerErrorException('Captain relation not loaded for the team.');
-    }
-    
+    const team = await this.teamRepository.findOne({ where: { id: teamId }, relations: { captain: true } });
+    if (!team) throw new NotFoundException('Equipo no encontrado.');
+    if (!team.captain) throw new InternalServerErrorException('No se pudo verificar el capitán del equipo.');
     if (team.captain.id !== captain.id) {
-      throw new ForbiddenException('Only the team captain can add members.');
+      throw new ForbiddenException('Solo el capitán del equipo puede añadir miembros.');
     }
-    
     const memberToAdd = await this.userRepository.findOneBy({ id: addMemberDto.userId });
-    if (!memberToAdd) throw new NotFoundException('User to add not found');
-
+    if (!memberToAdd) throw new NotFoundException('Usuario a añadir no encontrado.');
     const teamMember = this.teamMemberRepository.create({ teamId, userId: addMemberDto.userId });
     await this.teamMemberRepository.save(teamMember);
-    
-    return { message: 'Member added successfully.' };
+    return { message: 'Miembro añadido exitosamente.' };
+  }
+
+  async update(teamId: string, updateTeamDto: UpdateTeamDto, user: User) {
+    const team = await this.teamRepository.findOne({ where: { id: teamId }, relations: { captain: true } });
+
+    if (!team) {
+      throw new NotFoundException(`Equipo con ID "${teamId}" no encontrado.`);
+    }
+
+    // Verificación de propiedad: solo el capitán puede editar.
+    if (team.captain.id !== user.id) {
+      throw new ForbiddenException('No tienes permiso para editar este equipo.');
+    }
+
+    // Combina los datos del equipo con los nuevos datos del DTO y guarda.
+    Object.assign(team, updateTeamDto);
+    return this.teamRepository.save(team);
   }
 }

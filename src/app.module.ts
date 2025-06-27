@@ -14,6 +14,7 @@ import { Tournament } from './tournaments/entities/tournament.entity';
 import { TournamentInscription } from './tournaments/entities/tournament-inscription.entity';
 import { Match } from './matches/entities/match.entity';
 import { SeedModule } from './seed/seed.module';
+import { FilesModule } from './files/files.module';
 
 @Module({
   imports: [
@@ -44,6 +45,7 @@ import { SeedModule } from './seed/seed.module';
     TeamsModule,
     MatchesModule,
     SeedModule,
+    FilesModule,
 
   ], 
 })
