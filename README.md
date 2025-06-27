@@ -8,11 +8,9 @@ Levantar la base de datos
 
 docker-compose up -d
 
-
 Instalar dependencias
 
 npm install
-
 
 Configurar variables de entorno
 
@@ -23,7 +21,6 @@ Llena todas las variables requeridas en el archivo .env (credenciales de la base
 Ejecutar la aplicación
 
 npm run start:dev
-
 
 2. Herramientas de Desarrollo
 Seeder (Poblar Base de Datos con Datos de Prueba)
@@ -46,11 +43,11 @@ URL: http://localhost:3000/auth/register
 Body (raw, JSON):
 
 {
-    "name": "Jhair Palacios",
-    "email": "jhair.player@upchiapas.edu.mx",
-    "password": "PasswordTest123!",
-    "phone": "9612345678",
-    "role": "player or organizer"
+  "name": "Jhair Palacios",
+  "email": "jhair.player@upchiapas.edu.mx",
+  "password": "PasswordTest123!",
+  "phone": "9612345678",
+  "role": "player"
 }
 
 B. Iniciar sesión
@@ -65,8 +62,27 @@ Body (raw, JSON): (Usa las credenciales del Seeder para pruebas)
     "password": "PasswordTest123!"
 }
 
-
 ¡Copia el accessToken para usarlo en los siguientes pasos!
+
+Rutas Protegidas (Requieren autenticación)
+Para todas las siguientes peticiones, asegúrate de añadir el Bearer Token en la pestaña Authorization.
+
+A. Ver mi perfil
+Método: GET
+
+URL: http://localhost:3000/auth/profile
+
+Nota: Devuelve la información del usuario que está actualmente logueado (ideal para que la app muestre el nombre, foto, ID, etc.).
+
+B. Ver todos los usuarios
+Método: GET
+
+URL: http://localhost:3000/auth
+
+C. Ver un usuario por ID
+Método: GET
+
+URL: http://localhost:3000/auth/:id
 
 Módulo de Subida de Archivos (/files)
 Este módulo se encarga de recibir imágenes y subirlas a la nube (Cloudinary).
@@ -85,9 +101,8 @@ Value: (Selecciona un archivo de imagen)
 Respuesta:
 
 {
-  "secure_url": "https://res.cloudinary.com/.../imagen.jpg"
+  "secure_url": "[https://res.cloudinary.com/.../imagen.jpg](https://res.cloudinary.com/.../imagen.jpg)"
 }
-
 
 Nota: La secure_url devuelta se debe usar para actualizar las fotos de perfil o logos de equipo.
 
@@ -104,7 +119,6 @@ Body (raw, JSON):
   "name": "Los Gladiadores",
   "logo": "URL_OBTENIDA_DE_/files/upload"
 }
-
 
 B. Añadir un miembro a un equipo
 Método: POST
@@ -149,7 +163,4 @@ Aprobar/Rechazar una inscripción: PATCH /tournaments/:tournamentId/inscriptions
 Generar calendario automático: POST /tournaments/:id/generate-schedule
 
 Módulo de Partidos (/matches)
-Rutas Protegidas (Requieren rol de organizer)
-Crear un partido manually: POST /matches
-
-Registrar el resultado de un partido: PATCH /matches/:id/result
+Rutas Protegidas (Requieren rol de
