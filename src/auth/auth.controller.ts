@@ -6,14 +6,16 @@ import {
   Patch,
   Param,
   Delete,
+  UseGuards,
   HttpCode,
-  UseGuards, 
 } from '@nestjs/common';
-import { AuthGuard } from '@nestjs/passport'; 
 import { AuthService } from './auth.service';
 import { CreateAuthDto } from './dto/create-auth.dto';
-import { UpdateAuthDto } from './dto/update-auth.dto';
 import { LoginAuthDto } from './dto/login-auth.dto';
+import { UpdateAuthDto } from './dto/update-auth.dto';
+import { AuthGuard } from '@nestjs/passport';
+import { GetUser } from './decorators/get-user.decorator';
+import { User } from './entities/user.entity';
 
 @Controller('auth')
 export class AuthController {
@@ -30,6 +32,12 @@ export class AuthController {
     return this.authService.login(loginAuthDto);
   }
 
+  // --- ENDPOINT NUEVO AÑADIDO ---
+  @Get('profile')
+  @UseGuards(AuthGuard('jwt')) // Protegemos la ruta, solo usuarios logueados pueden acceder
+  getProfile(@GetUser() user: User) {
+    return this.authService.getProfile(user);
+  }
 
   @Get()
   @UseGuards(AuthGuard('jwt'))
