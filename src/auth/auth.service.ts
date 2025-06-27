@@ -113,4 +113,8 @@ export class AuthService {
     const accessToken = this.jwtService.sign(payload);
     return { accessToken };
   }
+
+   getProfile(user: User) {
+    return user;
+  }
 }
