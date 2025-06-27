@@ -2,97 +2,183 @@
   <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
 </p>
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+# UP-Rivals-Ba
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+Backend para la plataforma de gestión de torneos deportivos universitarios de la Universidad Politécnica de Chiapas.
 
-## Description
+---
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+## 1. Configuración Inicial
 
-## Project setup
+Sigue estos pasos para levantar el entorno de desarrollo.
 
-```bash
-$ npm install
-```
+1.  **Levantar la base de datos**
+    ```bash
+    docker-compose up -d
+    ```
 
-## Compile and run the project
+2.  **Instalar dependencias**
+    ```bash
+    npm install
+    ```
 
-```bash
-# development
-$ npm run start
+3.  **Configurar variables de entorno**
+    * Clona el archivo `env.template` y renómbralo a `.env`.
+    * Llena todas las variables requeridas en el archivo `.env` (credenciales de la base de datos y `JWT_SECRET`).
 
-# watch mode
-$ npm run start:dev
+4.  **Ejecutar la aplicación**
+    ```bash
+    npm run start:dev
+    ```
+---
 
-# production mode
-$ npm run start:prod
-```
+## 2. Herramientas de Desarrollo
 
-## Run tests
+### Seeder (Poblar Base de Datos con Datos de Prueba)
 
-```bash
-# unit tests
-$ npm run test
+Para facilitar las pruebas, puedes usar el Seeder para limpiar la base de datos y llenarla con un conjunto de datos predefinidos (1 organizador, 4 jugadores, 1 torneo, 4 equipos inscritos y 3 de ellos aprobados).
 
-# e2e tests
-$ npm run test:e2e
+* **Método:** `POST`
+* **URL:** `http://localhost:3000/seed/execute`
+* **Nota:** Este endpoint no requiere autorización ni cuerpo (body).
 
-# test coverage
-$ npm run test:cov
-```
+---
 
-## Deployment
+## 3. Guía para Probar Endpoints con Postman
 
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
+### Módulo de Autenticación (`/auth`)
 
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
+#### Rutas Públicas
 
-```bash
-$ npm install -g @nestjs/mau
-$ mau deploy
-```
+##### A. Registrar un nuevo usuario
+* **Método:** `POST`
+* **URL:** `http://localhost:3000/auth/register`
 
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
+##### B. Iniciar sesión
+* **Método:** `POST`
+* **URL:** `http://localhost:3000/auth/login`
+* **Body (raw, JSON):** (Usa las credenciales del Seeder para pruebas)
+    ```json
+    {
+        "email": "organizer@upchiapas.edu.mx",
+        "password": "PasswordTest123!"
+    }
+    ```
 
-## Resources
+**¡Copia el `accessToken` para usarlo en los siguientes pasos!**
 
-Check out a few resources that may come in handy when working with NestJS:
+---
 
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
+### Módulo de Equipos (`/teams`)
 
-## Support
+#### Rutas Protegidas (Requieren autenticación)
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+##### A. Crear un nuevo equipo
+* **Método:** `POST`
+* **URL:** `http://localhost:3000/teams`
+* **Body (raw, JSON):**
+    ```json
+    {
+      "name": "Los Gladiadores",
+      "logo": "[https://i.imgur.com/logo-gladiadores.png](https://i.imgur.com/logo-gladiadores.png)"
+    }
+    ```
 
-## Stay in touch
+##### B. Añadir un miembro a un equipo
+* **Método:** `POST`
+* **URL:** `http://localhost:3000/teams/:teamId/members`
+* **Nota:** Solo el **capitán** del equipo puede añadir miembros.
 
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+---
 
-## License
+### Módulo de Torneos (`/tournaments`)
 
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+#### Rutas Públicas
+
+##### A. Listar todos los torneos
+* **Método:** `GET`
+* **URL:** `http://localhost:3000/tournaments`
+
+##### B. Ver un torneo por su ID
+* **Método:** `GET`
+* **URL:** `http://localhost:3000/tournaments/:id`
+
+##### C. Ver la tabla de posiciones de un torneo
+* **Método:** `GET`
+* **URL:** `http://localhost:3000/tournaments/:id/standings`
+
+##### D. Ver los partidos de un torneo
+* **Método:** `GET`
+* **URL:** `http://localhost:3000/tournaments/:id/matches`
+
+
+#### Rutas Protegidas
+
+Para las siguientes peticiones, asegúrate de añadir el `Bearer Token` en la pestaña `Authorization`.
+
+##### A. Ver mis torneos creados
+* **Método:** `GET`
+* **URL:** `http://localhost:3000/tournaments/my-tournaments`
+
+##### B. Inscribir un equipo a un torneo
+* **Método:** `POST`
+* **URL:** `http://localhost:3000/tournaments/:tournamentId/inscribe/:teamId`
+* **Nota:** Solo el **capitán** del equipo puede inscribirlo.
+
+#### Rutas de Organizador (Requieren rol de `organizer`)
+
+##### A. Crear un nuevo torneo
+* **Método:** `POST`
+* **URL:** `http://localhost:3000/tournaments`
+
+##### B. Actualizar un torneo
+* **Método:** `PATCH`
+* **URL:** `http://localhost:3000/tournaments/:id`
+
+##### C. Eliminar un torneo
+* **Método:** `DELETE`
+* **URL:** `http://localhost:3000/tournaments/:id`
+
+##### D. Ver solicitudes de inscripción de un torneo
+* **Método:** `GET`
+* **URL:** `http://localhost:3000/tournaments/:tournamentId/inscriptions`
+
+##### E. Aprobar/Rechazar una inscripción
+* **Método:** `PATCH`
+* **URL:** `http://localhost:3000/tournaments/:tournamentId/inscriptions/:teamId`
+* **Body (raw, JSON):** `{"status": "approved"}`
+
+##### F. Generar calendario de partidos automáticamente
+* **Método:** `POST`
+* **URL:** `http://localhost:3000/tournaments/:id/generate-schedule`
+* **Nota:** Genera un calendario "todos contra todos" (Round Robin) con los equipos aprobados en el torneo.
+
+---
+
+### Módulo de Partidos (`/matches`)
+
+#### Rutas Protegidas (Requieren rol de `organizer`)
+
+##### A. Crear un partido manualmente
+* **Método:** `POST`
+* **URL:** `http://localhost:3000/matches`
+* **Body (raw, JSON):**
+    ```json
+    {
+      "tournamentId": "ID_DEL_TORNEO",
+      "teamAId": "ID_DEL_EQUIPO_A",
+      "teamBId": "ID_DEL_EQUIPO_B",
+      "date": "2025-10-20T19:00:00.000Z"
+    }
+    ```
+
+##### B. Registrar el resultado de un partido
+* **Método:** `PATCH`
+* **URL:** `http://localhost:3000/matches/:id/result`
+* **Body (raw, JSON):**
+    ```json
+    {
+      "teamAScore": 3,
+      "teamBScore": 2
+    }
+    ```
