@@ -1,3 +1,12 @@
+
+import { randomUUID } from 'crypto';
+if (typeof global.crypto !== 'object') {
+  (global as any).crypto = {};
+}
+if (typeof global.crypto.randomUUID !== 'function') {
+  (global as any).crypto.randomUUID = randomUUID;
+}
+
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
@@ -32,11 +41,11 @@ import { FilesModule } from './files/files.module';
         database: configService.get<string>('DB_NAME'),
         username: configService.get<string>('DB_USERNAME'),
         password: configService.get<string>('DB_PASSWORD'),
-        
-        
+
+
         entities: [ User, Team, TeamMember, Tournament, TournamentInscription, Match ],
-        
-        synchronize: true, 
+
+        synchronize: true,
       }),
     }),
 
@@ -47,6 +56,6 @@ import { FilesModule } from './files/files.module';
     SeedModule,
     FilesModule,
 
-  ], 
+  ],
 })
 export class AppModule {}
