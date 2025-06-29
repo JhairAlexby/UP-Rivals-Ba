@@ -1,8 +1,14 @@
-import 'crypto';
+import { randomUUID } from 'crypto';
 import { NestFactory, Reflector } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { ValidationPipe, ClassSerializerInterceptor } from '@nestjs/common'; 
 import { Logger } from '@nestjs/common';
+
+if (!global.crypto) {
+  global.crypto = {
+    randomUUID: randomUUID
+  } as any;
+}
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -21,8 +27,7 @@ async function bootstrap() {
     }),
   );
 
-  // --- INTERCEPTOR GLOBAL AÑADIDO ---
-  // Este interceptor se aplicará a todas las respuestas de la aplicación.
+
   app.useGlobalInterceptors(new ClassSerializerInterceptor(app.get(Reflector)));
 
   const port = process.env.PORT || 3000;
