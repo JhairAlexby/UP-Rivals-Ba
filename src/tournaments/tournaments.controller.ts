@@ -93,8 +93,4 @@ export class TournamentsController {
     return this.tournamentsService.getMatches(tournamentId);
   }
 
-  
-
-  
-
 }

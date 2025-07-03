@@ -16,6 +16,11 @@ export class CreateAuthDto {
 
   @IsEmail({}, { message: 'El formato del correo electrónico no es válido.' })
   @IsNotEmpty({ message: 'El correo electrónico no puede estar vacío.' })
+  @Matches(/^[^@]+@([a-zA-Z0-9-]+\.)*upchiapas\.edu\.mx$/,
+    {
+      message: 'Solo se permiten correos institucionales de la UPChiapas.',
+    },
+  )
   email: string;
 
   @IsString()
