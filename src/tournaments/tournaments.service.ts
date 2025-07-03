@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException, ForbiddenException, ConflictException, InternalServerErrorException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Repository, In } from 'typeorm';
 import { Tournament } from './entities/tournament.entity';
 import { User } from 'src/auth/entities/user.entity';
 import { Team } from 'src/teams/entities/team.entity';
@@ -10,6 +10,7 @@ import { CreateTournamentDto } from './dto/create-tournament.dto';
 import { UpdateTournamentDto } from './dto/update-tournament.dto';
 import { UpdateInscriptionStatusDto } from './dto/update-inscription.dto';
 import { StandingsEntryDto } from './dto/standings-entry.dto';
+import { PendingInscriptionResponseDto } from './dto/pending-inscription-response.dto';
 
 @Injectable()
 export class TournamentsService {
@@ -206,5 +207,61 @@ export class TournamentsService {
         date: 'ASC'
       }
     });
+  }
+
+  /**
+   * Obtiene todas las solicitudes de inscripción pendientes 
+   * de todos los torneos creados por el organizador logueado
+   */
+  async getAllPendingInscriptionsByOrganizer(organizer: User): Promise<PendingInscriptionResponseDto[]> {
+    // Primero obtenemos todos los torneos del organizador
+     const organizerTournaments = await this.tournamentRepository.find({
+       where: { organizer: { id: organizer.id } },
+       select: ['id', 'name', 'category', 'startDate', 'endDate']
+     });
+
+    if (organizerTournaments.length === 0) {
+      return [];
+    }
+
+    // Extraemos los IDs de los torneos
+    const tournamentIds = organizerTournaments.map(tournament => tournament.id);
+
+    // Obtenemos todas las inscripciones pendientes de esos torneos
+     const pendingInscriptions = await this.inscriptionRepository.find({
+       where: {
+         tournamentId: In(tournamentIds),
+         status: 'pending'
+       },
+       relations: {
+         team: {
+           captain: true
+         },
+         tournament: true
+       }
+     });
+
+    // Formateamos la respuesta para incluir información completa
+     return pendingInscriptions.map(inscription => ({
+       inscriptionId: `${inscription.tournamentId}-${inscription.teamId}`,
+       status: inscription.status,
+       team: {
+         id: inscription.team.id,
+         name: inscription.team.name,
+         logo: inscription.team.logo,
+         captain: {
+           id: inscription.team.captain.id,
+           email: inscription.team.captain.email,
+           name: inscription.team.captain.name
+         }
+       },
+       tournament: {
+         id: inscription.tournament.id,
+         name: inscription.tournament.name,
+         category: inscription.tournament.category,
+         startDate: inscription.tournament.startDate,
+         endDate: inscription.tournament.endDate
+       }
+     }));
   }
 }
