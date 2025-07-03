@@ -11,6 +11,7 @@ import { UpdateTournamentDto } from './dto/update-tournament.dto';
 import { UpdateInscriptionStatusDto } from './dto/update-inscription.dto';
 import { StandingsEntryDto } from './dto/standings-entry.dto';
 import { PendingInscriptionResponseDto } from './dto/pending-inscription-response.dto';
+import { PlayerTournamentResponseDto } from './dto/player-tournament-response.dto';
 
 @Injectable()
 export class TournamentsService {
@@ -207,6 +208,52 @@ export class TournamentsService {
         date: 'ASC'
       }
     });
+  }
+
+  /**
+   * Obtiene todos los torneos en los que está inscrito un usuario
+   * (ya sea como capitán o como miembro de un equipo)
+   */
+  async findTournamentsByPlayer(user: User): Promise<PlayerTournamentResponseDto[]> {
+    // Obtener todos los equipos donde el usuario es miembro o capitán
+    const userTeams = await this.teamRepository.find({
+      where: [
+        { captain: { id: user.id } }, // Equipos donde es capitán
+        { members: { userId: user.id } } // Equipos donde es miembro
+      ],
+      relations: ['inscriptions', 'inscriptions.tournament', 'inscriptions.tournament.organizer']
+    });
+
+    // Extraer todos los torneos únicos de las inscripciones
+    const tournaments = new Map<string, PlayerTournamentResponseDto>();
+
+    userTeams.forEach(team => {
+      team.inscriptions.forEach(inscription => {
+        if (!tournaments.has(inscription.tournament.id)) {
+          tournaments.set(inscription.tournament.id, {
+            id: inscription.tournament.id,
+            name: inscription.tournament.name,
+            category: inscription.tournament.category,
+            modality: inscription.tournament.modality,
+            rules: inscription.tournament.rules,
+            startDate: inscription.tournament.startDate,
+            endDate: inscription.tournament.endDate,
+            maxTeams: inscription.tournament.maxTeams,
+            status: inscription.tournament.status,
+            inscriptionStatus: inscription.status,
+            teamName: team.name,
+            teamId: team.id,
+            organizer: {
+              id: inscription.tournament.organizer.id,
+              name: inscription.tournament.organizer.name,
+              email: inscription.tournament.organizer.email
+            }
+          });
+        }
+      });
+    });
+
+    return Array.from(tournaments.values());
   }
 
   /**
