@@ -34,8 +34,9 @@ export class TournamentsController {
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.tournamentsService.findOne(id);
+  @UseGuards(AuthGuard('jwt'))
+  findOne(@Param('id') id: string, @GetUser() user: User) {
+    return this.tournamentsService.findOneWithRegistrationStatus(id, user);
   }
 
   @Patch(':id')
