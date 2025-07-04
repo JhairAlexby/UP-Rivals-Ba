@@ -12,6 +12,7 @@ import { UpdateInscriptionStatusDto } from './dto/update-inscription.dto';
 import { StandingsEntryDto } from './dto/standings-entry.dto';
 import { PendingInscriptionResponseDto } from './dto/pending-inscription-response.dto';
 import { PlayerTournamentResponseDto } from './dto/player-tournament-response.dto';
+import { TournamentWithRegistrationDto } from './dto/tournament-with-registration.dto';
 
 @Injectable()
 export class TournamentsService {
@@ -36,6 +37,30 @@ export class TournamentsService {
     const tournament = await this.tournamentRepository.findOneBy({ id });
     if (!tournament) throw new NotFoundException(`Tournament with ID "${id}" not found`);
     return tournament;
+  }
+
+  async findOneWithRegistrationStatus(id: string, user: User): Promise<TournamentWithRegistrationDto> {
+    const tournament = await this.tournamentRepository.findOneBy({ id });
+    if (!tournament) throw new NotFoundException(`Tournament with ID "${id}" not found`);
+
+    // Verificar si el usuario está registrado en este torneo
+    const userTeams = await this.teamRepository.find({
+      where: [
+        { captain: { id: user.id } }, // Equipos donde es capitán
+        { members: { userId: user.id } } // Equipos donde es miembro
+      ],
+      relations: ['inscriptions']
+    });
+
+    // Verificar si alguno de los equipos del usuario está inscrito en este torneo
+    const isRegistered = userTeams.some(team => 
+      team.inscriptions.some(inscription => inscription.tournamentId === id)
+    );
+
+    return {
+      ...tournament,
+      isRegistered
+    };
   }
   async findTournamentsByOrganizer(user: User) {
     return this.tournamentRepository.find({ where: { organizer: { id: user.id } } });
