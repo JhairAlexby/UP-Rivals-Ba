@@ -9,6 +9,7 @@ import { AuthModule } from 'src/auth/auth.module';
 import { TournamentInscription } from './entities/tournament-inscription.entity';
 import { Team } from 'src/teams/entities/team.entity';
 import { Match } from 'src/matches/entities/match.entity';
+import { TeamsModule } from 'src/teams/teams.module';
 
 @Module({
   controllers: [TournamentsController, OrganizerController, PlayerController],
@@ -16,6 +17,7 @@ import { Match } from 'src/matches/entities/match.entity';
   imports: [
     TypeOrmModule.forFeature([Tournament, TournamentInscription, Team, Match]),
     AuthModule,
+    TeamsModule,
   ],
 })
 export class TournamentsModule {}

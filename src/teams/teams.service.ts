@@ -7,6 +7,7 @@ import { Team } from './entities/team.entity';
 import { User } from 'src/auth/entities/user.entity';
 import { TeamMember } from './entities/team-member.entity';
 import { AddMemberDto } from './dto/add-member.dto';
+import { PlayerTeamsResponseDto } from './dto/player-teams-response.dto';
 
 @Injectable()
 export class TeamsService {
@@ -55,5 +56,32 @@ export class TeamsService {
     // Combina los datos del equipo con los nuevos datos del DTO y guarda.
     Object.assign(team, updateTeamDto);
     return this.teamRepository.save(team);
+  }
+
+  async findTeamsByPlayer(user: User): Promise<PlayerTeamsResponseDto[]> {
+    // Obtener todos los equipos donde el usuario es capitán
+    const userTeams = await this.teamRepository.find({
+      where: { captain: { id: user.id } },
+      relations: ['inscriptions', 'inscriptions.tournament']
+    });
+
+    // Mapear los equipos con información del torneo
+    const teamsWithTournaments: PlayerTeamsResponseDto[] = [];
+
+    userTeams.forEach(team => {
+      team.inscriptions.forEach(inscription => {
+        teamsWithTournaments.push({
+          teamId: team.id,
+          teamName: team.name,
+          teamLogo: team.logo,
+          tournament: {
+            tournamentId: inscription.tournament.id,
+            tournamentName: inscription.tournament.name
+          }
+        });
+      });
+    });
+
+    return teamsWithTournaments;
   }
 }
