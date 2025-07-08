@@ -10,6 +10,7 @@ import { User } from 'src/auth/entities/user.entity';
 @Module({
   controllers: [TeamsController],
   providers: [TeamsService],
+  exports: [TeamsService],
   imports: [
     TypeOrmModule.forFeature([Team, TeamMember, User]), 
     AuthModule,
