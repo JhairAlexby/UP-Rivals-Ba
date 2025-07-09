@@ -1,4 +1,4 @@
-import { Controller, Post, Body, UseGuards, Param, Patch } from '@nestjs/common';
+import { Controller, Post, Body, UseGuards, Param, Patch, Get } from '@nestjs/common';
 import { TeamsService } from './teams.service';
 import { CreateTeamDto } from './dto/create-team.dto';
 import { UpdateTeamDto } from './dto/update-team.dto';
@@ -27,6 +27,11 @@ export class TeamsController {
     @GetUser() captain: User,
   ) {
     return this.teamsService.addMember(teamId, addMemberDto, captain);
+  }
+
+  @Get(':id')
+  findOne(@Param('id') teamId: string) {
+    return this.teamsService.findOne(teamId);
   }
 
   @Patch(':id')

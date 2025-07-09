@@ -41,6 +41,19 @@ export class TeamsService {
     return { message: 'Miembro añadido exitosamente.' };
   }
 
+  async findOne(teamId: string) {
+    const team = await this.teamRepository.findOne({
+      where: { id: teamId },
+      relations: ['captain', 'members', 'members.user', 'inscriptions', 'inscriptions.tournament']
+    });
+
+    if (!team) {
+      throw new NotFoundException(`Equipo con ID "${teamId}" no encontrado.`);
+    }
+
+    return team;
+  }
+
   async update(teamId: string, updateTeamDto: UpdateTeamDto, user: User) {
     const team = await this.teamRepository.findOne({ where: { id: teamId }, relations: { captain: true } });
 
