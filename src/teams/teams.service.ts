@@ -7,6 +7,7 @@ import { Team } from './entities/team.entity';
 import { User } from 'src/auth/entities/user.entity';
 import { TeamMember } from './entities/team-member.entity';
 import { AddMemberDto } from './dto/add-member.dto';
+import { AddMemberByQrDto } from './dto/add-member-by-qr.dto';
 import { PlayerTeamsResponseDto } from './dto/player-teams-response.dto';
 
 @Injectable()
@@ -96,5 +97,76 @@ export class TeamsService {
     });
 
     return teamsWithTournaments;
+  }
+
+  async addMemberByQR(teamId: string, addMemberByQrDto: AddMemberByQrDto, captain: User) {
+    // Verificar que el equipo existe y que el usuario es el capitán
+    const team = await this.teamRepository.findOne({ 
+      where: { id: teamId }, 
+      relations: { captain: true } 
+    });
+    
+    if (!team) {
+      throw new NotFoundException('Equipo no encontrado.');
+    }
+    
+    if (!team.captain) {
+      throw new InternalServerErrorException('No se pudo verificar el capitán del equipo.');
+    }
+    
+    if (team.captain.id !== captain.id) {
+      throw new ForbiddenException('Solo el capitán del equipo puede añadir miembros.');
+    }
+
+    // Buscar usuario por código QR
+    const memberToAdd = await this.findUserByQRCode(addMemberByQrDto.qrCode);
+    
+    // Verificar que el usuario no sea el mismo capitán
+    if (memberToAdd.id === captain.id) {
+      throw new ConflictException('El capitán no puede añadirse a sí mismo como miembro.');
+    }
+
+    // Verificar que el usuario no esté ya en el equipo
+    const existingMember = await this.teamMemberRepository.findOne({
+      where: { teamId, userId: memberToAdd.id }
+    });
+    
+    if (existingMember) {
+      throw new ConflictException('Este usuario ya es miembro del equipo.');
+    }
+
+    // Añadir el miembro al equipo
+    const teamMember = this.teamMemberRepository.create({ 
+      teamId, 
+      userId: memberToAdd.id 
+    });
+    
+    await this.teamMemberRepository.save(teamMember);
+    
+    return {
+      message: 'Miembro añadido exitosamente mediante código QR.',
+      member: {
+        id: memberToAdd.id,
+        name: memberToAdd.name,
+        email: memberToAdd.email
+      }
+    };
+  }
+
+  private async findUserByQRCode(qrCode: string): Promise<Omit<User, 'password'>> {
+    if (!qrCode) {
+      throw new NotFoundException('QR code is required');
+    }
+
+    const user = await this.userRepository.findOne({ 
+      where: { qrCode, isActive: true },
+      select: ['id', 'name', 'email', 'phone', 'profilePicture', 'institution', 'career', 'role', 'qrCode']
+    });
+
+    if (!user) {
+      throw new NotFoundException('User not found with the provided QR code');
+    }
+
+    return user;
   }
 }

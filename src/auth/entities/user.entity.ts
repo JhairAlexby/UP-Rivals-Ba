@@ -1,4 +1,4 @@
-import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, OneToMany, PrimaryGeneratedColumn, BeforeInsert } from 'typeorm';
 import { Exclude } from 'class-transformer'; // <-- ¡IMPORTACIÓN AÑADIDA!
 import { Tournament } from 'src/tournaments/entities/tournament.entity';
 import { Team } from 'src/teams/entities/team.entity';
@@ -41,6 +41,15 @@ export class User {
 
   @Column({ type: 'boolean', default: true })
   isActive: boolean;
+
+  @Column({ type: 'text', unique: true, nullable: true })
+  qrCode?: string;
+
+  @BeforeInsert()
+  private generateQRCode() {
+    // Generar código único para QR basado en timestamp + random
+    this.qrCode = `QR_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+  }
 
   @OneToMany(() => Tournament, (tournament) => tournament.organizer)
   organizedTournaments: Tournament[];

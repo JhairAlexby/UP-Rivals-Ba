@@ -6,6 +6,7 @@ import { AuthGuard } from '@nestjs/passport';
 import { GetUser } from 'src/auth/decorators/get-user.decorator';
 import { User } from 'src/auth/entities/user.entity';
 import { AddMemberDto } from './dto/add-member.dto';
+import { AddMemberByQrDto } from './dto/add-member-by-qr.dto';
 
 @Controller('teams')
 @UseGuards(AuthGuard('jwt')) 
@@ -41,5 +42,14 @@ export class TeamsController {
     @GetUser() user: User, // Obtenemos el usuario que hace la petición
   ) {
     return this.teamsService.update(teamId, updateTeamDto, user);
+  }
+
+  @Post(':teamId/members/qr')
+  addMemberByQR(
+    @Param('teamId') teamId: string,
+    @Body() addMemberByQrDto: AddMemberByQrDto,
+    @GetUser() captain: User,
+  ) {
+    return this.teamsService.addMemberByQR(teamId, addMemberByQrDto, captain);
   }
 }

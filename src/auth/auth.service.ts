@@ -117,4 +117,21 @@ export class AuthService {
    getProfile(user: User) {
     return user;
   }
+
+  async findUserByQRCode(qrCode: string): Promise<Omit<User, 'password'>> {
+    if (!qrCode) {
+      throw new NotFoundException('QR code is required');
+    }
+
+    const user = await this.userRepository.findOne({ 
+      where: { qrCode, isActive: true },
+      select: ['id', 'name', 'email', 'phone', 'profilePicture', 'institution', 'career', 'role', 'qrCode']
+    });
+
+    if (!user) {
+      throw new NotFoundException('User not found with the provided QR code');
+    }
+
+    return user;
+  }
 }
