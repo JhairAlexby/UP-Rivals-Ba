@@ -23,4 +23,17 @@ export class OrganizerController {
   getAllPendingInscriptions(@GetUser() organizer: User) {
     return this.tournamentsService.getAllPendingInscriptionsByOrganizer(organizer);
   }
+
+  /**
+   * Endpoint para obtener todos los partidos pendientes de calificar
+   * de todos los torneos creados por el organizador logueado
+   * 
+   * GET /organizer/pending-matches
+   */
+  @Get('pending-matches')
+  @UseGuards(AuthGuard('jwt'), RolesGuard)
+  @Roles(UserRole.ORGANIZER)
+  getAllPendingMatches(@GetUser() organizer: User) {
+    return this.tournamentsService.getAllPendingMatchesByOrganizer(organizer);
+  }
 }

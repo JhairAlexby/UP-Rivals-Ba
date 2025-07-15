@@ -13,6 +13,7 @@ import { StandingsEntryDto } from './dto/standings-entry.dto';
 import { PendingInscriptionResponseDto } from './dto/pending-inscription-response.dto';
 import { PlayerTournamentResponseDto } from './dto/player-tournament-response.dto';
 import { TournamentWithRegistrationDto } from './dto/tournament-with-registration.dto';
+import { OrganizerPendingMatchesResponseDto } from './dto/organizer-pending-matches-response.dto';
 
 @Injectable()
 export class TournamentsService {
@@ -335,5 +336,62 @@ export class TournamentsService {
          endDate: inscription.tournament.endDate
        }
      }));
+  }
+
+  /**
+   * Obtiene todos los partidos pendientes de calificar
+   * de todos los torneos creados por el organizador logueado
+   */
+  async getAllPendingMatchesByOrganizer(organizer: User): Promise<OrganizerPendingMatchesResponseDto[]> {
+    // Primero obtenemos todos los torneos del organizador
+    const organizerTournaments = await this.tournamentRepository.find({
+      where: { organizer: { id: organizer.id } },
+      select: ['id', 'name', 'category']
+    });
+
+    if (organizerTournaments.length === 0) {
+      return [];
+    }
+
+    // Extraemos los IDs de los torneos
+    const tournamentIds = organizerTournaments.map(tournament => tournament.id);
+
+    // Obtenemos todos los partidos pendientes (scheduled) de esos torneos
+    const pendingMatches = await this.matchRepository.find({
+      where: {
+        tournament: { id: In(tournamentIds) },
+        status: 'scheduled'
+      },
+      relations: {
+        tournament: true,
+        teamA: true,
+        teamB: true
+      },
+      order: {
+        date: 'ASC'
+      }
+    });
+
+    // Formateamos la respuesta
+    return pendingMatches.map(match => ({
+      matchId: match.id,
+      date: match.date,
+      status: match.status,
+      tournament: {
+        id: match.tournament.id,
+        name: match.tournament.name,
+        category: match.tournament.category
+      },
+      teamA: {
+        id: match.teamA.id,
+        name: match.teamA.name,
+        logo: match.teamA.logo
+      },
+      teamB: {
+        id: match.teamB.id,
+        name: match.teamB.name,
+        logo: match.teamB.logo
+      }
+    }));
   }
 }
