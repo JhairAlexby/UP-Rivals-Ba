@@ -6,12 +6,13 @@ import { User } from './entities/user.entity';
 import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
 import { JwtStrategy } from './strategies/jwt.strategy';
+import { QrService } from './services/qr.service';
 // --- CORRECCIÓN: La ruta correcta es '@nestjs/config' ---
 import { ConfigModule, ConfigService } from '@nestjs/config';
 
 @Module({
   controllers: [AuthController],
-  providers: [AuthService, JwtStrategy],
+  providers: [AuthService, JwtStrategy, QrService],
   imports: [
     // Importamos ConfigModule para que esté disponible en este módulo.
     ConfigModule, 
@@ -27,6 +28,6 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
       }),
     }),
   ],
-  exports: [TypeOrmModule, JwtStrategy, PassportModule],
+  exports: [TypeOrmModule, JwtStrategy, PassportModule, QrService],
 })
 export class AuthModule {}
