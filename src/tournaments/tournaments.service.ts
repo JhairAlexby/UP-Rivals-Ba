@@ -63,6 +63,12 @@ export class TournamentsService {
       isRegistered
     };
   }
+
+  async findOnePublic(id: string): Promise<Tournament> {
+    const tournament = await this.tournamentRepository.findOneBy({ id });
+    if (!tournament) throw new NotFoundException(`Tournament with ID "${id}" not found`);
+    return tournament;
+  }
   async findTournamentsByOrganizer(user: User) {
     return this.tournamentRepository.find({ where: { organizer: { id: user.id } } });
   }
