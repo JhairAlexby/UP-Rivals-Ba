@@ -297,7 +297,6 @@ export class TournamentsService {
       return [];
     }
 
-    // Extraemos los IDs de los torneos
     const tournamentIds = organizerTournaments.map(tournament => tournament.id);
 
     // Obtenemos todas las inscripciones pendientes de esos torneos
