@@ -39,6 +39,11 @@ export class TournamentsController {
     return this.tournamentsService.findOneWithRegistrationStatus(id, user);
   }
 
+  @Get(':id/public')
+  findOnePublic(@Param('id') id: string) {
+    return this.tournamentsService.findOnePublic(id);
+  }
+
   @Patch(':id')
   @UseGuards(AuthGuard('jwt'), RolesGuard)
   @Roles(UserRole.ORGANIZER)
