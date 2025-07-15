@@ -14,6 +14,7 @@ import { PendingInscriptionResponseDto } from './dto/pending-inscription-respons
 import { PlayerTournamentResponseDto } from './dto/player-tournament-response.dto';
 import { TournamentWithRegistrationDto } from './dto/tournament-with-registration.dto';
 import { OrganizerPendingMatchesResponseDto } from './dto/organizer-pending-matches-response.dto';
+import { PlayerPendingMatchesResponseDto } from './dto/player-pending-matches-response.dto';
 
 @Injectable()
 export class TournamentsService {
@@ -347,7 +348,7 @@ export class TournamentsService {
    * Obtiene todos los partidos pendientes de calificar
    * de todos los torneos creados por el organizador logueado
    */
-  async getAllPendingMatchesByOrganizer(organizer: User): Promise<OrganizerPendingMatchesResponseDto[]> {
+  async getAllPendingMatchesByOrganizer(organizer: User ): Promise<OrganizerPendingMatchesResponseDto[]> {
     // Primero obtenemos todos los torneos del organizador
     const organizerTournaments = await this.tournamentRepository.find({
       where: { organizer: { id: organizer.id } },
@@ -398,5 +399,82 @@ export class TournamentsService {
         logo: match.teamB.logo
       }
     }));
+  }
+
+  /**
+   * Obtiene todos los partidos pendientes
+   * de todos los torneos en los que el jugador está inscrito
+   */
+  async getAllPendingMatchesByPlayer(player: User): Promise<PlayerPendingMatchesResponseDto[]> {
+    // Primero obtenemos todos los equipos del jugador (como capitán o miembro)
+    const userTeams = await this.teamRepository.find({
+      where: [
+        { captain: { id: player.id } }, // Equipos donde es capitán
+        { members: { userId: player.id } } // Equipos donde es miembro
+      ],
+      relations: ['inscriptions']
+    });
+
+    if (userTeams.length === 0) {
+      return [];
+    }
+
+    // Extraemos los IDs de los equipos del usuario
+    const userTeamIds = userTeams.map(team => team.id);
+
+    // Obtenemos todos los partidos pendientes donde participa alguno de los equipos del usuario
+    const pendingMatches = await this.matchRepository.find({
+      where: [
+        {
+          teamA: { id: In(userTeamIds) },
+          status: 'scheduled'
+        },
+        {
+          teamB: { id: In(userTeamIds) },
+          status: 'scheduled'
+        }
+      ],
+      relations: {
+        tournament: true,
+        teamA: true,
+        teamB: true
+      },
+      order: {
+        date: 'ASC'
+      }
+    });
+
+    // Formateamos la respuesta incluyendo información del equipo del usuario
+    return pendingMatches.map(match => {
+      const isTeamA = userTeamIds.includes(match.teamA.id);
+      const userTeam = isTeamA ? match.teamA : match.teamB;
+
+      return {
+        matchId: match.id,
+        date: match.date,
+        status: match.status,
+        tournament: {
+          id: match.tournament.id,
+          name: match.tournament.name,
+          category: match.tournament.category
+        },
+        teamA: {
+          id: match.teamA.id,
+          name: match.teamA.name,
+          logo: match.teamA.logo
+        },
+        teamB: {
+          id: match.teamB.id,
+          name: match.teamB.name,
+          logo: match.teamB.logo
+        },
+        userTeam: {
+          id: userTeam.id,
+          name: userTeam.name,
+          logo: userTeam.logo,
+          isTeamA: isTeamA
+        }
+      };
+    });
   }
 }

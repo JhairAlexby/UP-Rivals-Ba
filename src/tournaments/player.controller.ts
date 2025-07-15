@@ -18,8 +18,14 @@ export class PlayerController {
    */
   @Get('my-tournaments')
   @UseGuards(AuthGuard('jwt'))
-  getMyTournaments(@GetUser() user: User) {
+  findMyTournaments(@GetUser() user: User) {
     return this.tournamentsService.findTournamentsByPlayer(user);
+  }
+
+  @Get('pending-matches')
+  @UseGuards(AuthGuard('jwt'))
+  getPendingMatches(@GetUser() user: User) {
+    return this.tournamentsService.getAllPendingMatchesByPlayer(user);
   }
 
   /**
